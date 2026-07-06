@@ -19,9 +19,8 @@
     </ul>
 
     <div class="nav-actions">
-      <button class="btn-login">Log In</button>
-      <button class="btn-get-started">Get Started</button>
-    </div>
+      <button class="btn-login" @click="navigateTo('/login')">Log In</button>
+      <button class="btn-get-started" @click="navigateTo('/register')">Get Started</button>    </div>
   </nav>
 </template>
 
