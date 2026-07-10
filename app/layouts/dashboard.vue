@@ -1,0 +1,165 @@
+<template>
+  <div class="dashboard-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <Leaf class="logo-icon" :size="20" />
+        <span class="logo-text">Nutri<span class="logo-match">Match</span></span>
+      </div>
+      <p class="sidebar-subtitle">CLINICAL NUTRITION SYSTEM</p>
+      <span class="rnd-badge">● RND PORTAL</span>
+
+      <nav class="sidebar-nav">
+        <p class="nav-group-label">MAIN</p>
+        <NuxtLink
+          v-for="item in mainNav"
+          :key="item.label"
+          :to="item.to"
+          class="nav-item"
+          :class="{ active: route.path === item.to }"
+        >
+          <component :is="item.icon" class="nav-icon" :size="17" />
+          <span class="nav-label">{{ item.label }}</span>
+          <span v-if="item.badge" class="nav-badge">{{ item.badge }}</span>
+        </NuxtLink>
+
+        <p class="nav-group-label">CLINICAL</p>
+        <NuxtLink
+          v-for="item in clinicalNav"
+          :key="item.label"
+          :to="item.to"
+          class="nav-item"
+          :class="{ active: route.path === item.to }"
+        >
+          <component :is="item.icon" class="nav-icon" :size="17" />
+          <span class="nav-label">{{ item.label }}</span>
+        </NuxtLink>
+
+        <p class="nav-group-label">RESOURCES</p>
+        <NuxtLink
+          v-for="item in resourceNav"
+          :key="item.label"
+          :to="item.to"
+          class="nav-item"
+          :class="{ active: route.path === item.to }"
+        >
+          <component :is="item.icon" class="nav-icon" :size="17" />
+          <span class="nav-label">{{ item.label }}</span>
+        </NuxtLink>
+      </nav>
+    </aside>
+
+    <!-- MAIN COLUMN -->
+    <div class="main-column">
+      <!-- STICKY TOP HEADER -->
+      <header class="topbar">
+        <div>
+          <h1>{{ pageTitle }}</h1>
+          <span class="topbar-date">{{ todayLabel }}</span>
+        </div>
+        <div class="topbar-actions">
+          <div class="search-box">
+            <Search class="search-icon" :size="15" />
+            <input type="text" placeholder="Search patients, records..." />
+          </div>
+          <button class="icon-btn"><MessageSquare :size="17" /></button>
+          <button class="icon-btn"><Bell :size="17" /></button>
+          <button class="icon-btn avatar-btn"><User :size="17" /></button>
+        </div>
+      </header>
+
+      <!-- SCROLLABLE CONTENT -->
+      <main class="content">
+        <slot />
+      </main>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import {
+  Leaf, LayoutDashboard, Users, Calendar, ClipboardList, Compass,
+  TrendingUp, BookOpen, CreditCard, CheckSquare, Search, MessageSquare, Bell, User
+} from 'lucide-vue-next'
+
+const route = useRoute()
+const todayLabel = 'Friday, May 15, 2026'
+
+// Page title comes from each page's definePageMeta({ title: '...' })
+const pageTitle = computed(() => route.meta.title || 'Dashboard')
+
+const mainNav = [
+  { icon: LayoutDashboard, label: 'Dashboard', to: '/rnd-dashboard' },
+  { icon: Users, label: 'My Patients', to: '/my-patients', badge: 28 },
+  { icon: Calendar, label: 'Appointments', to: '/appointments', badge: 5 }
+]
+const clinicalNav = [
+  { icon: ClipboardList, label: 'NCP Records', to: '/ncp-records' },
+  { icon: Compass, label: 'Meal Planning', to: '/meal-planning' },
+  { icon: TrendingUp, label: 'Progress Reports', to: '/progress-reports' }
+]
+const resourceNav = [
+  { icon: BookOpen, label: 'Resource Library', to: '/resource-library' },
+  { icon: CreditCard, label: 'Billing', to: '/billing' },
+  { icon: CheckSquare, label: 'Task Manager', to: '/task-manager' }
+]
+</script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600;700&display=swap');
+
+* { box-sizing: border-box; }
+
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  font-family: 'Inter', sans-serif;
+  background: #f7f8f6;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 240px; flex-shrink: 0; background: #14301a; color: #fff;
+  padding: 24px 20px; height: 100vh; position: sticky; top: 0; overflow-y: auto;
+}
+.sidebar-brand { display: flex; align-items: center; gap: 8px; font-size: 1.15rem; font-weight: 700; }
+.logo-icon { color: #D4A017; flex-shrink: 0; }
+.logo-match { color: #D4A017; }
+.sidebar-subtitle { font-size: 0.62rem; letter-spacing: 0.1em; color: #7a9a7a; margin: 6px 0 12px; }
+.rnd-badge {
+  display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em;
+  color: #D4A017; border: 1px solid #D4A017; padding: 4px 10px; border-radius: 20px; margin-bottom: 24px;
+}
+.nav-group-label { font-size: 0.65rem; letter-spacing: 0.1em; color: #5a7a5a; margin: 20px 0 8px; padding-left: 10px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 10px; border-radius: 8px;
+  color: #c8d8c8; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: background 0.15s;
+  position: relative; text-decoration: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.05); }
+.nav-item.active { background: #1e4a26; color: #fff; }
+.nav-icon { flex-shrink: 0; }
+.nav-label { flex: 1; }
+.nav-badge { background: #D4A017; color: #1a3a1a; font-size: 0.68rem; font-weight: 700; padding: 1px 7px; border-radius: 10px; }
+
+/* MAIN COLUMN */
+.main-column { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 10; background: #fff; border-bottom: 1px solid #eceeec;
+  padding: 18px 32px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.topbar h1 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #1a3a1a; margin: 0; }
+.topbar-date { font-size: 0.8rem; color: #8a9a8a; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.search-box { display: flex; align-items: center; gap: 8px; background: #f4f6f4; border-radius: 8px; padding: 8px 14px; width: 260px; }
+.search-box input { border: none; background: none; outline: none; font-size: 0.85rem; width: 100%; }
+.search-icon { color: #9aaa9a; flex-shrink: 0; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e5e8e5;
+  background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5a4a;
+}
+.avatar-btn { border-radius: 50%; }
+
+.content { flex: 1; overflow-y: auto; padding: 24px 32px 48px; }
+</style>
