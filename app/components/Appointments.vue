@@ -1,265 +1,189 @@
 <template>
-  <div class="appointments-layout">
-    <!-- CALENDAR PANEL -->
-    <div class="panel calendar-panel">
-      <div class="calendar-header">
-        <h2>{{ monthLabel }}</h2>
-        <div class="calendar-nav">
-          <button @click="prevMonth"><ChevronLeft :size="16" /></button>
-          <button @click="nextMonth"><ChevronRight :size="16" /></button>
-        </div>
-      </div>
-
-      <div class="calendar-grid">
-        <span class="dow" v-for="d in ['SUN','MON','TUE','WED','THU','FRI','SAT']" :key="d">{{ d }}</span>
-
-        <button
-          v-for="cell in calendarCells"
-          :key="cell.key"
-          class="day-cell"
-          :class="{ blank: !cell.day, selected: cell.isSelected, today: cell.isToday }"
-          :disabled="!cell.day"
-          @click="selectDay(cell)"
-        >
-          <span class="day-number">{{ cell.day }}</span>
-          <span v-if="cell.hasAppt" class="day-dot" :class="{ 'dot-today': cell.isToday }"></span>
-        </button>
-      </div>
-
-      <div class="calendar-legend">
-        <span class="legend-item"><span class="dot dot-mint"></span> Has appointment</span>
-        <span class="legend-item"><span class="dot dot-gold"></span> Today</span>
-      </div>
+  <div class="appointments-page">
+    <div class="page-header">
+      <h1 class="page-title">Appointments</h1>
+      <p class="page-sub">Manage your upcoming and past consultations.</p>
     </div>
 
-    <!-- SCHEDULE PANEL -->
-    <div class="panel schedule-panel">
-      <div class="schedule-header">
-        <div>
-          <h3>{{ selectedDateLabel }}</h3>
-          <p class="schedule-count">{{ selectedSessions.length }} Scheduled Sessions</p>
-        </div>
-        <button class="btn-schedule"><Plus :size="15" /> Schedule</button>
-      </div>
+    <!-- FILTER TABS -->
+    <div v-if="appointments.length" class="filter-tabs">
+      <button
+        v-for="f in filters"
+        :key="f.label"
+        class="filter-tab"
+        :class="{ active: activeFilter === f.label }"
+        @click="activeFilter = f.label"
+      >
+        {{ f.label }}
+      </button>
+    </div>
 
-      <div class="session-list">
-        <div
-          v-for="session in selectedSessions"
-          :key="session.time + session.name"
-          class="session-card"
-          :class="'accent-' + session.statusColor"
-        >
-          <div class="session-time">
-            <span class="time-main">{{ session.time.split(' ')[0] }}</span>
-            <span class="time-suffix">{{ session.time.split(' ')[1] }}</span>
-          </div>
-          <div class="session-body">
-            <div class="session-top">
-              <span class="session-name">{{ session.name }}</span>
-              <span class="status-pill" :class="'status-' + session.statusColor">
-                <component :is="session.statusIcon" :size="11" />
-                {{ session.status }}
-              </span>
-            </div>
-            <div class="session-meta">
-              <MapPin v-if="session.mode === 'in-person'" :size="12" />
-              <Video v-else :size="12" />
-              {{ session.type }} · {{ session.duration }} · {{ session.location }}
-            </div>
-            <span class="session-tag">{{ session.tag }}</span>
-          </div>
+    <!-- APPOINTMENT LIST -->
+    <div v-if="appointments.length" class="appt-list">
+      <div
+        v-if="filteredAppointments.length"
+        v-for="appt in filteredAppointments"
+        :key="appt.id"
+        class="appt-card"
+        :class="{ 'appt-completed': appt.status === 'Completed' }"
+      >
+        <div class="appt-date" :class="{ 'date-muted': appt.status === 'Completed' }">
+          <span class="appt-day">{{ appt.day }}</span>
+          <span class="appt-month">{{ appt.month }}</span>
         </div>
-
-        <p v-if="!selectedSessions.length" class="no-sessions">No appointments scheduled for this day.</p>
+        <div class="appt-avatar" :style="{ background: appt.avatarColor }">{{ appt.initials }}</div>
+        <div class="appt-info">
+          <p class="appt-name">
+            {{ appt.name }}
+            <span class="appt-status-pill" :class="appt.statusClass">{{ appt.statusLabel }}</span>
+          </p>
+          <p class="appt-detail">{{ appt.detail }}</p>
+        </div>
+        <div class="appt-action">
+          <span v-if="appt.note" class="appt-note">{{ appt.note }}</span>
+          <template v-else>
+            <button v-if="appt.canStart" class="start-session-btn" @click="startSession(appt)">Start Session</button>
+            <button v-if="appt.canConfirm" class="confirm-btn" @click="confirmAppointment(appt)">Confirm</button>
+            <button v-if="appt.canConfirm" class="decline-btn" @click="declineAppointment(appt)">Decline</button>
+            <button v-if="appt.canViewChart" class="chart-btn" @click="navigateTo(`/ncp-records?patient=${appt.name}`)">View Chart</button>
+            <button v-if="appt.canReschedule" class="reschedule-btn" @click="rescheduleAppointment(appt)">Reschedule</button>
+            <button v-if="appt.canViewRecord" class="chart-btn" @click="navigateTo(`/ncp-records?patient=${appt.name}`)">View NCP Record</button>
+          </template>
+        </div>
       </div>
+      <p v-if="!filteredAppointments.length" class="empty-text">No appointments match this filter.</p>
+    </div>
+
+    <!-- EMPTY STATE: no appointments at all -->
+    <div v-else class="empty-state">
+      <div class="empty-icon"><CalendarDays :size="28" /></div>
+      <p class="empty-title">No appointments yet</p>
+      <p class="empty-desc">Once patients book sessions with you, they'll show up here.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ChevronLeft, ChevronRight, Plus, MapPin, Video, CheckCircle2, Clock3, CalendarClock } from 'lucide-vue-next'
+import { CalendarDays } from 'lucide-vue-next'
+import { db } from '~/mock/mockDatabase'
 
-// --- Current view state ---
-const viewMonth = ref(3) // April = index 3
-const viewYear = ref(2026)
-const selectedDate = ref(27) // April 27 selected by default (matches "today" in mock)
-const todayDate = 27
+definePageMeta({ layout: 'dashboard', title: 'Appointments' })
 
-const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December']
-const monthLabel = computed(() => `${monthNames[viewMonth.value]} ${viewYear.value}`)
+const activeFilter = ref('All')
 
-// --- Mock appointment data keyed by day number ---
-const appointmentsByDay = {
-  3: [],
-  7: [],
-  10: [],
-  14: [],
-  15: [],
-  18: [],
-  21: [],
-  22: [],
-  25: [],
-  27: [
-    { time: '9:00 AM', name: 'Maria Lourdes Santos', type: 'Initial Assessment', duration: '60 min', location: 'Room 3', mode: 'in-person', tag: 'MNT — Type 2 Diabetes', status: 'Confirmed', statusColor: 'green', statusIcon: CheckCircle2 },
-    { time: '10:30 AM', name: 'Jose Ramon Cruz', type: 'Follow-up', duration: '45 min', location: 'Telehealth', mode: 'video', tag: 'Hypertension Diet', status: 'In Progress', statusColor: 'gold', statusIcon: Clock3 },
-    { time: '2:00 PM', name: 'Ana Luisa Reyes', type: 'Follow-up', duration: '30 min', location: 'Telehealth', mode: 'video', tag: 'Weight Management', status: 'Scheduled', statusColor: 'blue', statusIcon: CalendarClock },
-    { time: '4:00 PM', name: 'Roberto Bautista', type: 'Initial Assessment', duration: '60 min', location: 'Room 1', mode: 'in-person', tag: 'CKD Nutrition Support', status: 'Pending', statusColor: 'grey', statusIcon: Clock3 }
-  ],
-  28: []
-}
+const filters = [
+  { label: 'All' },
+  { label: 'Pending Confirmation' },
+  { label: 'Confirmed' },
+  { label: 'Completed' },
+  { label: 'Cancelled' }
+]
 
-const selectedSessions = computed(() => appointmentsByDay[selectedDate.value] || [])
+const appointments = ref(db.appointments)
 
-const selectedDateLabel = computed(() => {
-  const isToday = selectedDate.value === todayDate
-  const label = `${monthNames[viewMonth.value].slice(0,3)} ${selectedDate.value}`
-  return isToday ? `${label} — Today` : label
+const filteredAppointments = computed(() => {
+  if (activeFilter.value === 'All') return appointments.value
+  if (activeFilter.value === 'Pending Confirmation') {
+    return appointments.value.filter(a => a.status === 'Pending Confirmation' || a.status === 'Awaiting Screening')
+  }
+  return appointments.value.filter(a => a.status === activeFilter.value)
 })
 
-// --- Calendar grid generation ---
-const calendarCells = computed(() => {
-  const firstDayOfWeek = new Date(viewYear.value, viewMonth.value, 1).getDay()
-  const daysInMonth = new Date(viewYear.value, viewMonth.value + 1, 0).getDate()
-
-  const cells = []
-  for (let i = 0; i < firstDayOfWeek; i++) {
-    cells.push({ key: 'blank-' + i, day: null })
-  }
-  for (let d = 1; d <= daysInMonth; d++) {
-    cells.push({
-      key: 'day-' + d,
-      day: d,
-      isToday: d === todayDate,
-      isSelected: d === selectedDate.value,
-      hasAppt: !!(appointmentsByDay[d] && appointmentsByDay[d].length)
-    })
-  }
-  return cells
-})
-
-function selectDay(cell) {
-  if (!cell.day) return
-  selectedDate.value = cell.day
+function startSession(appt) {
+  navigateTo(`/appointments/session?patient=${appt.name}`)
 }
 
-function prevMonth() {
-  if (viewMonth.value === 0) {
-    viewMonth.value = 11
-    viewYear.value--
-  } else {
-    viewMonth.value--
-  }
+function confirmAppointment(appt) {
+  // Wire this up to your real confirm-appointment API call
+  appt.status = 'Confirmed'
+  appt.statusLabel = 'Confirmed'
+  appt.statusClass = 'confirmed'
+  appt.canConfirm = false
+  appt.canViewChart = true
 }
-function nextMonth() {
-  if (viewMonth.value === 11) {
-    viewMonth.value = 0
-    viewYear.value++
-  } else {
-    viewMonth.value++
-  }
+
+function declineAppointment(appt) {
+  // Wire this up to your real decline-appointment API call
+  appointments.value = appointments.value.filter(a => a.id !== appt.id)
+}
+
+function rescheduleAppointment(appt) {
+  navigateTo(`/appointments/reschedule?id=${appt.id}`)
 }
 </script>
 
 <style scoped>
-.appointments-layout {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 20px;
-  align-items: start;
+* { box-sizing: border-box; }
+
+.appointments-page { font-family: 'Inter', sans-serif; }
+
+.page-header { margin-bottom: 20px; }
+.page-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: #1a3a1a; margin: 0 0 4px; }
+.page-sub { font-size: 0.88rem; color: #6a7a6a; margin: 0; }
+
+/* FILTER TABS */
+.filter-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+.filter-tab {
+  border: 1px solid #e5e8e5; background: #fff; color: #4a5a4a;
+  border-radius: 20px; padding: 9px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+}
+.filter-tab.active { background: #14301a; color: #fff; border-color: #14301a; }
+
+/* APPOINTMENT LIST */
+.appt-list { display: flex; flex-direction: column; gap: 16px; }
+.appt-card {
+  background: #fff; border-radius: 12px; border: 1px solid #eceeec; padding: 20px 22px;
+  display: flex; align-items: center; gap: 16px;
+}
+.appt-card.appt-completed { opacity: 0.7; }
+
+.appt-date {
+  width: 52px; height: 52px; border-radius: 8px; background: #eef3ec;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.appt-date.date-muted { background: #eceeec; }
+.appt-day { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #1a3a1a; line-height: 1; }
+.appt-month { font-size: 0.62rem; letter-spacing: 0.05em; color: #6a7a6a; margin-top: 2px; }
+
+.appt-avatar {
+  width: 32px; height: 32px; border-radius: 50%; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0;
 }
 
-.panel { background: #fff; border-radius: 12px; padding: 24px; border: 1px solid #eceeec; }
+.appt-info { flex: 1; }
+.appt-name { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 700; color: #1a3a1a; margin: 0 0 4px; }
+.appt-status-pill { font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; white-space: nowrap; }
+.appt-status-pill.confirmed { background: #e6efe0; color: #3a6b3a; }
+.appt-status-pill.awaiting { background: #faead0; color: #b8860b; }
+.appt-status-pill.pending { background: #faead0; color: #b8860b; }
+.appt-status-pill.completed { background: #eceeec; color: #7a8a7a; }
+.appt-detail { font-size: 0.8rem; color: #6a7a6a; margin: 0; }
 
-/* CALENDAR */
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
-.calendar-header h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #1a3a1a; margin: 0; }
-.calendar-nav { display: flex; gap: 8px; }
-.calendar-nav button {
-  width: 30px; height: 30px; border-radius: 8px; border: 1px solid #e0e5e0;
-  background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5a4a;
+.appt-action { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.appt-note { font-size: 0.82rem; color: #b8860b; background: #faf1de; padding: 10px 16px; border-radius: 8px; max-width: 320px; text-align: right; }
+
+.start-session-btn, .confirm-btn {
+  background: #D4A017; color: #1a3a1a; border: none; border-radius: 8px;
+  padding: 10px 18px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap;
 }
-.calendar-nav button:hover { background: #f4f6f4; }
-
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.dow { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.05em; color: #9aaa9a; text-align: center; padding-bottom: 8px; }
-
-.day-cell {
-  aspect-ratio: 1; border: 1px solid transparent; border-radius: 8px;
-  background: #fafbfa; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
-  font-family: inherit; position: relative;
+.decline-btn {
+  background: none; border: none; color: #8a9a8a; font-size: 0.85rem; font-weight: 600; cursor: pointer;
 }
-.day-cell:hover:not(:disabled) { background: #f0f3f0; }
-.day-cell.blank { visibility: hidden; cursor: default; }
-.day-cell .day-number { font-size: 0.85rem; color: #3a4a3a; }
-.day-cell.today { border-color: #D4A017; background: #fffbf0; }
-.day-cell.today .day-number { color: #b8860b; font-weight: 700; }
-.day-cell.selected { background: #163a1c; }
-.day-cell.selected .day-number { color: #fff; font-weight: 700; }
-
-.day-dot { width: 5px; height: 5px; border-radius: 50%; background: #4caf7d; }
-.day-dot.dot-today { background: #D4A017; }
-.day-cell.selected .day-dot { background: #D4A017; }
-
-.calendar-legend { display: flex; gap: 20px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #eceeec; }
-.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #6a7a6a; }
-.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-.dot-mint { background: #4caf7d; }
-.dot-gold { background: #D4A017; }
-
-/* SCHEDULE */
-.schedule-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.schedule-header h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #1a3a1a; margin: 0 0 2px; }
-.schedule-count { font-size: 0.8rem; color: #8a9a8a; margin: 0; }
-
-.btn-schedule {
-  display: flex; align-items: center; gap: 6px;
-  background: #163a1c; color: #fff; border: none;
-  padding: 8px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; flex-shrink: 0;
-}
-.btn-schedule:hover { background: #10300f; }
-
-.session-list { display: flex; flex-direction: column; gap: 14px; }
-
-.session-card {
-  display: flex; gap: 14px;
-  background: #fafbfa; border-radius: 10px; padding: 14px;
-  border-left: 3px solid #ccc;
-}
-.session-card.accent-green { border-left-color: #2e9e52; }
-.session-card.accent-gold { border-left-color: #D4A017; }
-.session-card.accent-blue { border-left-color: #3b6fd6; }
-.session-card.accent-grey { border-left-color: #9aa8a0; }
-
-.session-time { display: flex; flex-direction: column; align-items: center; min-width: 44px; flex-shrink: 0; }
-.time-main { font-size: 0.85rem; font-weight: 700; color: #1a3a1a; }
-.time-suffix { font-size: 0.65rem; color: #9aaa9a; }
-
-.session-body { flex: 1; min-width: 0; }
-.session-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
-.session-name { font-size: 0.92rem; font-weight: 600; color: #1a3a1a; }
-
-.status-pill {
-  display: flex; align-items: center; gap: 4px; flex-shrink: 0;
-  font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 20px; white-space: nowrap;
-}
-.status-green { background: #e6f4e6; color: #2e7d32; }
-.status-gold { background: #fdf1d6; color: #b8860b; }
-.status-blue { background: #e3edfc; color: #3b6fd6; }
-.status-grey { background: #eef0ee; color: #6a7a6a; }
-
-.session-meta {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 0.78rem; color: #7a8a7a; margin-bottom: 8px;
-}
-.session-tag {
-  display: inline-block; font-size: 0.72rem; font-weight: 600;
-  background: #eef2ee; color: #4a5a4a; padding: 3px 10px; border-radius: 6px;
+.chart-btn, .reschedule-btn {
+  border: 1px solid #d5dad5; background: #fff; color: #2a2a2a;
+  border-radius: 8px; padding: 10px 18px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap;
 }
 
-.no-sessions { font-size: 0.85rem; color: #9aaa9a; text-align: center; padding: 32px 0; }
-
-@media (max-width: 1100px) {
-  .appointments-layout { grid-template-columns: 1fr; }
+/* EMPTY STATE */
+.empty-state {
+  background: #fff; border-radius: 12px; border: 1px solid #eceeec;
+  padding: 60px 20px; text-align: center;
 }
+.empty-icon {
+  width: 56px; height: 56px; border-radius: 50%; background: #eef3ec; color: #1e4a26;
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+}
+.empty-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #1a3a1a; margin: 0 0 6px; }
+.empty-desc { font-size: 0.85rem; color: #8a9a8a; margin: 0; }
+.empty-text { font-size: 0.85rem; color: #9aaa9a; padding: 20px; text-align: center; }
 </style>

@@ -235,83 +235,120 @@ import {
   Eye, Plus, ChevronDown, Printer, Pencil, Send, X,
   Sun, Coffee, Utensils, Apple, Moon
 } from 'lucide-vue-next'
+import { db } from '~/mock/mockDatabase'
 
 const mode = ref('view')
-const patients = ['Maria A. Santos', 'Juan R. Dela Cruz', 'Luisa C. Reyes']
-const selectedPatient = ref('Maria A. Santos')
+
+// Patient list + selection — pulled from the shared mock db
+const patients = computed(() => db.patients.map(p => p.name))
+const selectedPatient = ref(db.patients[0]?.name || '')
+
+const selectedPatientId = computed(() => {
+  const match = db.patients.find(p => p.name === selectedPatient.value)
+  return match?.id || null
+})
 
 const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 const activeDay = ref('Mon')
+const mealOrder = ['Breakfast', 'Morning Snack', 'Lunch', 'Afternoon Snack', 'Dinner']
+const mealIcons = { Breakfast: Sun, 'Morning Snack': Coffee, Lunch: Utensils, 'Afternoon Snack': Apple, Dinner: Moon }
+const mealAccents = { Breakfast: 'green', 'Morning Snack': 'gold', Lunch: 'blue', 'Afternoon Snack': 'gold', Dinner: 'blue' }
 
-const planMeta = reactive({
-  name: 'Week 1 Low GI',
-  dietType: 'Low GI',
-  kcalPerDay: 1600
-})
-
-const nutrition = {
-  calories: { value: 1144, target: 1600 },
-  carbs: { value: 145, target: 200 },
-  protein: { value: 81, target: 80 },
-  fat: { value: 26, target: 53 }
+function emptyWeek() {
+  const week = {}
+  for (const day of days) {
+    week[day] = {}
+    for (const type of mealOrder) week[day][type] = { time: '', items: [] }
+  }
+  return week
 }
+
+const planMeta = reactive({ name: '', dietType: '', kcalPerDay: 0 })
+const targets = reactive({ carb: 0, protein: 0, fat: 0 })
+const instructions = reactive({ allergies: '', notes: '' })
+const weeklyPlan = reactive(emptyWeek())
+
+// Load whichever patient's plan matches the current selection, deep-copied
+// so edits here don't mutate the shared mock db directly.
+function loadPlanForPatient() {
+  const found = db.mealPlanDetails.find(m => m.patientId === selectedPatientId.value)
+
+  if (!found) {
+    planMeta.name = ''
+    planMeta.dietType = ''
+    planMeta.kcalPerDay = 0
+    targets.carb = 0
+    targets.protein = 0
+    targets.fat = 0
+    instructions.allergies = ''
+    instructions.notes = ''
+    Object.assign(weeklyPlan, emptyWeek())
+    return
+  }
+
+  planMeta.name = found.planName
+  planMeta.dietType = found.dietType
+  planMeta.kcalPerDay = found.kcalTarget
+  targets.carb = found.carbTarget
+  targets.protein = found.proteinTarget
+  targets.fat = found.fatTarget
+  instructions.allergies = found.allergies
+  instructions.notes = found.notes
+  Object.assign(weeklyPlan, JSON.parse(JSON.stringify(found.week)))
+}
+
+loadPlanForPatient()
+watch(selectedPatient, loadPlanForPatient)
+
+// Nutritional Summary is now computed live from the active day's actual items
+const nutrition = computed(() => {
+  const dayTotals = { calories: 0, carb: 0, protein: 0, fat: 0 }
+  for (const type of mealOrder) {
+    for (const item of weeklyPlan[activeDay.value][type].items) {
+      dayTotals.calories += Number(item.kcal) || 0
+      dayTotals.carb += Number(item.carb) || 0
+      dayTotals.protein += Number(item.prot) || 0
+      dayTotals.fat += Number(item.fat) || 0
+    }
+  }
+  return {
+    calories: { value: dayTotals.calories, target: planMeta.kcalPerDay },
+    carbs: { value: dayTotals.carb, target: targets.carb },
+    protein: { value: dayTotals.protein, target: targets.protein },
+    fat: { value: dayTotals.fat, target: targets.fat }
+  }
+})
 function pct(n) {
+  if (!n.target) return 0
   return Math.min(100, Math.round((n.value / n.target) * 100))
 }
 
-const instructions = reactive({
-  allergies: '',
-  notes: ''
-})
-
-// --- Mock weekly plan data (editable) ---
-const weeklyPlan = reactive({
-  Mon: [
-    { type: 'Breakfast', icon: Sun, accent: 'green', time: '7:00 AM',
-      items: [{ name: 'Egg', portion: '1', kcal: 78, carb: 1, prot: 6, fat: 5 }] },
-    { type: 'Morning Snack', icon: Coffee, accent: 'gold', time: '10:00 AM',
-      items: [{ name: 'Bread', portion: '5', kcal: 70, carb: 2, prot: 3, fat: 6 }] },
-    { type: 'Lunch', icon: Utensils, accent: 'blue', time: '12:00 PM',
-      items: [{ name: 'Sinigang', portion: '2', kcal: 30, carb: 1, prot: 4, fat: 0 }] },
-    { type: 'Afternoon Snack', icon: Apple, accent: 'gold', time: '3:30 PM', items: [] },
-    { type: 'Dinner', icon: Moon, accent: 'blue', time: '6:30 PM', items: [] }
-  ],
-  Tue: [], Wed: [], Thu: [], Fri: [], Sat: [], Sun: []
-})
-
-// Ensure every day has all 5 meal slots even if empty
-for (const day of days) {
-  if (!weeklyPlan[day].length) {
-    weeklyPlan[day] = [
-      { type: 'Breakfast', icon: Sun, accent: 'green', time: '7:00 AM', items: [] },
-      { type: 'Morning Snack', icon: Coffee, accent: 'gold', time: '10:00 AM', items: [] },
-      { type: 'Lunch', icon: Utensils, accent: 'blue', time: '12:00 PM', items: [] },
-      { type: 'Afternoon Snack', icon: Apple, accent: 'gold', time: '3:30 PM', items: [] },
-      { type: 'Dinner', icon: Moon, accent: 'blue', time: '6:30 PM', items: [] }
-    ]
-  }
-}
-
 const currentDayMeals = computed(() => {
-  return weeklyPlan[activeDay.value].map(meal => {
+  return mealOrder.map(type => {
+    const meal = weeklyPlan[activeDay.value][type]
     const totalKcal = meal.items.reduce((sum, i) => sum + (Number(i.kcal) || 0), 0)
     const summary = meal.items.filter(i => i.name).map(i => `${i.name} (${i.portion || '1'})`).join(' + ')
     const breakdown = meal.items.filter(i => i.name)
       .map(i => `${i.name}: ${i.kcal || 0}kcal | ${i.carb || 0}g carb | ${i.prot || 0}g prot | ${i.fat || 0}g fat`)
       .join(' | ')
-    return { ...meal, kcal: totalKcal, title: summary || 'No items added', breakdown: breakdown || '—' }
+    return {
+      type,
+      time: meal.time,
+      items: meal.items,
+      icon: mealIcons[type],
+      accent: mealAccents[type],
+      kcal: totalKcal,
+      title: summary || 'No items added',
+      breakdown: breakdown || '—'
+    }
   })
 })
 
 function addItem(meal) {
-  const dayMeals = weeklyPlan[activeDay.value]
-  const target = dayMeals.find(m => m.type === meal.type)
-  target.items.push({ name: '', portion: '', kcal: 0, carb: 0, prot: 0, fat: 0 })
+  weeklyPlan[activeDay.value][meal.type].items.push({ name: '', portion: '', kcal: 0, carb: 0, prot: 0, fat: 0 })
 }
 function removeItem(meal, idx) {
-  const dayMeals = weeklyPlan[activeDay.value]
-  const target = dayMeals.find(m => m.type === meal.type)
-  target.items.splice(idx, 1)
+  weeklyPlan[activeDay.value][meal.type].items.splice(idx, 1)
 }
 
 function firstFoodSummary(meal) {
@@ -323,11 +360,13 @@ function mealTotal(meal, field) {
   return meal.items.reduce((sum, i) => sum + (Number(i[field]) || 0), 0)
 }
 function dayTotal(field) {
-  return weeklyPlan[activeDay.value].reduce((sum, meal) => sum + mealTotal(meal, field), 0)
+  return currentDayMeals.value.reduce((sum, meal) => sum + mealTotal(meal, field), 0)
 }
 function macroPct(field) {
-  const targets = { kcal: planMeta.kcalPerDay, carb: 200, prot: 80, fat: 53 }
-  return Math.min(100, Math.round((dayTotal(field) / targets[field]) * 100))
+  const fieldTargets = { kcal: planMeta.kcalPerDay, carb: targets.carb, prot: targets.protein, fat: targets.fat }
+  const target = fieldTargets[field]
+  if (!target) return 0
+  return Math.min(100, Math.round((dayTotal(field) / target) * 100))
 }
 </script>
 
