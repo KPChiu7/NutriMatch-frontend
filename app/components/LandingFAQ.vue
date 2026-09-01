@@ -39,7 +39,7 @@ const faqs = [
 
 .faq {
   background: #ffffff;
-  padding: 80px 200px;
+  padding: 100px 200px;
   font-family: 'Inter', sans-serif;
 }
 

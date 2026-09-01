@@ -1,9 +1,11 @@
 <template>
-  <section class="features" id="features">
+  <section class="features" id="features" style="background-color: #F9F8F0;">
     <div class="features-header">
-      <div class="eyebrow"><span class="eyebrow-line"></span> BUILT FOR FILIPINO HEALTHCARE</div>
+      <div class="eyebrow" style="color:#004635;"font-size: 0.75rem;><span class="eyebrow-line"></span> BUILT FOR FILIPINO HEALTHCARE</div>
       <h2>Everything for Clinical Nutrition Care</h2>
-      <p>From Client-RND matching to FNRI-compliant meal plans, every step of your care journey is covered.</p>
+      <p style="font-family: 'Inter', sans-serif; font-size: 1rem; color: #5a7a5a; max-width: 600px; margin: 0 auto; line-height: 1.7;">
+        From Client-RND matching to FNRI-compliant meal plans, every step of your care journey is covered.
+      </p>
     </div>
 
     <div class="features-grid">
@@ -52,7 +54,7 @@ const features = [
 
 .features {
   background: #f5f5e8;
-  padding: 80px 72px;
+  padding: 100px 72px;
   font-family: 'Inter', sans-serif;
 }
 
@@ -108,6 +110,15 @@ const features = [
   padding: 32px 24px;
   text-align: center;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+ 
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 24px 40px rgba(26, 58, 26, 0.16),
+              0 8px 16px rgba(26, 58, 26, 0.08);
 }
 
 .feature-img-wrap {
@@ -116,12 +127,25 @@ const features = [
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 24px;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
+ 
+.feature-card:hover .feature-img-wrap {
+  transform: scale(1.08);
+  box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.25);
+}
+
 
 .feature-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.4s ease;
+}
+ 
+.feature-card:hover .feature-img {
+  transform: scale(1.1);
 }
 
 .feature-card h3 {
@@ -130,6 +154,11 @@ const features = [
   font-weight: 700;
   color: #1a3a1a;
   margin-bottom: 12px;
+  transition: color 0.3s ease;
+}
+ 
+.feature-card:hover h3 {
+  color: #00674F;
 }
 
 .feature-card p {
@@ -137,13 +166,13 @@ const features = [
   color: #6a8a6a;
   line-height: 1.65;
 }
-
+ 
 .features-cta {
   text-align: center;
 }
-
+ 
 .btn-gold {
-  background: #D4A017;
+  background: #EFBF04;
   border: none;
   color: #1a3a1a;
   padding: 16px 36px;
@@ -151,13 +180,20 @@ const features = [
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, transform 0.2s;
 }
-
-.btn-gold:hover { background: #c4920f; }
-
+ 
+.btn-gold:hover {
+  background: #c4920f;
+  transform: translateY(-2px);
+}
+ 
 @media (max-width: 900px) {
   .features-grid { grid-template-columns: repeat(2, 1fr); }
   .features { padding: 60px 24px; }
 }
 </style>
+ 
+
+
+

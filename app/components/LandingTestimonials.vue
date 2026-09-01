@@ -55,14 +55,14 @@ const testimonials = [
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600&display=swap');
 
 .testimonials {
-  background: #fafaec;
-  padding: 80px 72px;
+  background: #FDFBD4;
+  padding: 100px 90px;
   font-family: 'Inter', sans-serif;
 }
 
 .testimonials-header {
   text-align: center;
-  margin-bottom: 56px;
+  margin-bottom: 64px;
 }
 
 .eyebrow {
@@ -72,14 +72,14 @@ const testimonials = [
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #D4A017;
-  margin-bottom: 16px;
+  color: #1a3a1a;
+  margin-bottom: 1px;
 }
 
 .eyebrow-line {
   display: inline-block;
   width: 28px;
-  height: 2px;
+  height: 3px;
   background: #D4A017;
 }
 
@@ -97,31 +97,48 @@ const testimonials = [
   color: #6a8a6a;
   max-width: 460px;
   margin: 0 auto;
+  font-size: 0.75rem;
   line-height: 1.7;
 }
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(250px, 1fr));
+  justify-content: center;
   gap: 24px;
+  width: 70%;
+  margin: 0 auto;
 }
-
 .card {
   background: #ffffff;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+ box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 24px 40px rgba(26, 58, 26, 0.16),
+   0 8px 16px rgba(26, 58, 26, 0.08);
 }
 
 .card-img-wrap {
   height: 180px;
   overflow: hidden;
 }
-
 .card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .card-img {
+  transform: scale(1.06);
 }
 
 .stars {
@@ -136,6 +153,7 @@ const testimonials = [
   color: #2a4a2a;
   line-height: 1.7;
   padding: 0 24px 20px;
+  font-size:0.75rem;
   font-style: italic;
 }
 
@@ -152,7 +170,7 @@ const testimonials = [
   height: 36px;
   border-radius: 50%;
   background: #2a5a2a;
-  color: #ffffff;
+  color: #EFBF04;
   font-size: 0.72rem;
   font-weight: 700;
   display: flex;
