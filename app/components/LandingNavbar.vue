@@ -5,7 +5,7 @@
         <img src="/resources/nutrimatchlogo.png" alt="NutriMatch Logo" class="logo-img" />
       </div>
       <span class="logo-text">
-        <span class="logo-nutri" style="font-family: 'DM Serif Display', serif; font-weight: 700;font-size:medium;">Nutri</span><span class="logo-match" style="font-family: 'DM Serif Display', serif; font-weight: 700; font-size: medium;">Match</span>
+        <span class="logo-nutri" style="font-family: 'DM Serif Display', serif; font-weight: 701;font-size:medium;">Nutri</span><span class="logo-match" style="font-family: 'DM Serif Display', serif; font-weight: 700; font-size: medium;">Match</span>
       </span>
     </div>
 

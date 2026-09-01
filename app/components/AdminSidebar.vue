@@ -67,6 +67,7 @@ async function handleSignOut() {
             ? 'bg-forest-light text-white font-medium'
             : 'text-cream/65 hover:bg-forest-light/60 hover:text-white hover:font-medium hover:translate-x-0.5 hover:shadow-sm'"
         >
+        
           <span
             class="nav-indicator absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-full bg-gold-light transition-all duration-200"
             :class="isActive(item.to)
