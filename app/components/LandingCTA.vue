@@ -20,7 +20,10 @@
     <footer class="footer">
       <div class="footer-grid">
         <div class="footer-brand">
-          <div class="footer-logo"><span class="logo-nutri">Nutri</span><span class="logo-match">Match</span></div>
+          <div class="footer-logo-row">
+            <img src="/resources/nutrimatchlogo.png" alt="NutriMatch Logo" class="logo-img" />
+            <div class="footer-logo"><span class="logo-nutri">Nutri</span><span class="logo-match">Match</span></div>
+          </div>
           <p>A web-based clinical nutrition consultation management system for Filipino RNDs and patients. Built for Philippine healthcare.</p>
           <span class="ra-badge">RA 10173 COMPLIANT</span>
         </div>
@@ -50,7 +53,7 @@
       </div>
 
       <div class="footer-bottom">
-        <span>© 2026 NutriMatch · BSIT Group 12 · STI College Davao · Chiu · Alba · Bulalaque · Leabres</span>
+        <span>© 2026 NutriMatch · BSIT Group 12 · STI College Davao · Timtim · Alba · Bulalaque · Leabres</span>
         <div class="footer-links">
           <a href="#">Privacy</a>
           <a href="#">Terms</a>
@@ -61,13 +64,14 @@
   </div>
 </template>
 
+
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@400;500;600&display=swap');
 
 /* CTA */
 .cta {
-  background: #1a3a1a;
-  padding: 100px 48px;
+  background: #004635;
+  padding: 150px 60px;
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -76,7 +80,7 @@
 
 .cta-circle {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 15%; left: 50%;
   transform: translate(-50%, -50%);
   width: 520px; height: 520px;
   border-radius: 50%;
@@ -90,26 +94,27 @@
   font-family: 'Playfair Display', serif;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700; font-style: italic;
-  color: #ffffff; line-height: 1.2; margin-bottom: 20px;
+  color: #ffffff; line-height: 1.3; margin-bottom: 50px;
 }
 
 .highlight { color: #D4A017; font-style: italic; }
 
 .cta-content p {
-  font-size: 0.95rem; color: #a8c4a8; line-height: 1.7; margin-bottom: 32px;
+  font-size: 0.75rem; color: #a8c4a8; line-height: 1.7; margin-bottom: 30px;
+
 }
 
-.cta-buttons { display: flex; gap: 16px; justify-content: center; margin-bottom: 20px; }
+.cta-buttons { display: flex; gap: 16px; justify-content: center; margin-bottom: 50px; }
 
 .btn-gold {
   background: #D4A017; border: none; color: #1a3a1a;
-  padding: 14px 28px; border-radius: 32px; font-size: 0.95rem; font-weight: 700; cursor: pointer;
+  padding: 14px 28px; border-radius: 32px; font-size: 0.95rem; font-weight: 500; cursor: pointer;
 }
 .btn-gold:hover { background: #c4920f; }
 
 .btn-outline {
   background: transparent; border: 1.5px solid #ffffff; color: #ffffff;
-  padding: 14px 28px; border-radius: 32px; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  padding: 14px 28px; border-radius: 32px; font-size: 0.95rem; font-weight: 500; cursor: pointer;
 }
 .btn-outline:hover { background: rgba(255,255,255,0.08); }
 
@@ -117,7 +122,7 @@
 
 /* FOOTER */
 .footer {
-  background: #0f2a0f;
+  background: #0D1F18;
   padding: 56px 72px 32px;
   font-family: 'Inter', sans-serif;
 }
@@ -126,32 +131,43 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px;
-  margin-bottom: 48px;
+  margin-bottom: 55px;
 }
 
-.footer-logo {
-  font-size: 1.2rem; font-weight: 700; margin-bottom: 14px;
+.footer-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
 }
-.logo-nutri { color: #D4A017; }
-.logo-match { color: #ffffff; }
+
+.logo-img {width: 36px; height : 36px; object-fit: contain;}
+.footer-logo {
+  font-size: 1.2rem; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 0.02em;
+}
+.logo-nutri { color: #004635; }
+.logo-match { color: #EFBF04; }
+
+
+
 
 .footer-brand p {
-  font-size: 0.82rem; color: #6a8a6a; line-height: 1.7; margin-bottom: 16px; max-width: 280px;
+  font-size: 0.75rem; color: #6a8a6a; line-height: 1.7; margin-bottom: 16px; max-width: 280px;
 }
 
 .ra-badge {
   display: inline-block; border: 1px solid #3a6a3a; color: #7aaa7a;
-  font-size: 0.65rem; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 4px;
+  font-size: 0.55rem; letter-spacing: 0.08em; padding: 4px 12px; border-radius: 4px;
 }
 
 .footer-col { display: flex; flex-direction: column; gap: 12px; }
 
 .footer-col-title {
-  font-size: 0.7rem; letter-spacing: 0.12em; font-weight: 600; color: #6a8a6a; margin-bottom: 4px;
+  font-size: 0.75rem; letter-spacing: 0.12em; font-weight: 600; color: #6a8a6a; margin-bottom: 4px;
 }
 
 .footer-col a {
-  font-size: 0.85rem; color: #c8d8c8; text-decoration: none; transition: color 0.2s;
+  font-size: 0.75rem; color: #c8d8c8; text-decoration: none; transition: color 0.2s;
 }
 .footer-col a:hover { color: #ffffff; }
 

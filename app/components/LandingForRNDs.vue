@@ -60,32 +60,32 @@ const phases = [
 }
 
 .for-rnds-content {
-  background: #eef4ee;
+  background: #E8F1ED;
   padding: 72px 56px;
   display: flex; flex-direction: column; justify-content: center; gap: 20px;
 }
 
 .eyebrow {
   display: inline-flex; align-items: center; gap: 10px;
-  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; color: #D4A017;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; color: #004635;
 }
-.eyebrow-line { display: inline-block; width: 28px; height: 2px; background: #D4A017; }
+.eyebrow-line { display: inline-block; width: 28px; height: 3px; background: #D4A017; }
 
 .for-rnds-content h2 {
   font-family: 'Playfair Display', serif;
-  font-size: 2.2rem; font-weight: 700; color: #1a3a1a; line-height: 1.2;
+  font-size: 2.2rem; font-weight: 700; color: #1a3a1a; line-height: 1.1; letter-spacing: 0.03em; margin-bottom: auto;
 }
 .highlight { color: #D4A017; font-style: italic; }
 
 .for-rnds-content > p {
-  font-size: 0.9rem; color: #4a6a4a; line-height: 1.7; max-width: 480px;
+  font-size: 0.75rem; color: #4a6a4a; line-height: 1.7; max-width: 480px;
 }
 
 .features-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .features-list li { display: flex; align-items: center; gap: 10px; font-size: 0.88rem; color: #2a4a2a; font-weight: 500; }
 .check {
   width: 22px; height: 22px; border-radius: 50%; background: #2a5a2a;
-  color: #ffffff; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  color: #EFBF04; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 
 .ncp-card {

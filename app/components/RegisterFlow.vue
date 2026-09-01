@@ -7,8 +7,8 @@
       <div class="circle circle-3"></div>
 
       <div class="brand">
-        <span class="logo-icon">🌿</span>
-        <span class="logo-text">Nutri<span class="logo-match">Match</span></span>
+        <img src="/resources/nutrimatchlogo.png" alt="NutriMatch Logo" class="logo-img" />
+        <span class="logo-text" style="font-family: 'DM Serif Display', serif; font-weight: 700; font-size: medium;">Nutri<span class="logo-match">Match</span></span>
       </div>
 
       <div class="left-content">
@@ -59,11 +59,17 @@
               :class="{ selected: selectedRole === role.value }"
               @click="selectedRole = role.value"
             >
-              <span class="role-icon">{{ role.icon }}</span>
+              <span class="role-icon" v-html="role.icon"></span>
               <span class="role-name">{{ role.label }}</span>
               <span class="role-desc">{{ role.desc }}</span>
             </button>
           </div>
+
+          <Transition name="fade-slide">
+            <div v-if="roleInfo" class="role-info-box">
+              <p>{{ roleInfo }}</p>
+            </div>
+          </Transition>
 
           <button class="btn-primary" :disabled="!selectedRole" @click="currentStep = 2">
             Continue →
@@ -214,11 +220,25 @@ const steps = [
   { label: 'Confirm' }
 ]
 
+// Line-style SVG icons to match the Figma design (person / stethoscope / shield)
+const icons = {
+  patient: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg>`,
+  rnd: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3v7a4 4 0 0 0 8 0V3"/><path d="M10 3v3M14 3v3"/><circle cx="18" cy="16" r="2.5"/><path d="M18 13.5V11"/></svg>`,
+  admin: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6l7-3z"/></svg>`
+}
+
 const roles = [
-  { value: 'patient', icon: '👤', label: 'Patient', desc: 'Find an RND' },
-  { value: 'rnd', icon: '🩺', label: 'RND', desc: 'Offer care' },
-  { value: 'admin', icon: '🛡️', label: 'Admin', desc: 'Manage' }
+  { value: 'patient', icon: icons.patient, label: 'Patient', desc: 'Find an RND' },
+  { value: 'rnd', icon: icons.rnd, label: 'RND', desc: 'Offer care' }
 ]
+
+// Info box text nga mo show the role grid, matching the Figma copy per role
+const roleInfoText = {
+  patient: "You'll be matched with PRC-verified nutritionist–dietitians based on your health goals and preferences. No verification needed to get started.",
+  rnd: "RND accounts require PRC license verification by our admin team — usually within 1–2 business days — before your profile goes live to clients."
+}
+
+const roleInfo = computed(() => roleInfoText[selectedRole.value] || '')
 
 function submitRegistration() {
   // TODO: connect to your backend/API here
@@ -239,7 +259,7 @@ function submitRegistration() {
 
 /* LEFT PANEL */
 .left-panel {
-  background: #1a3a1a;
+  background: linear-gradient(160deg, #0b3022 0%, #063c2a 60%, #052a1d 100%);
   position: relative;
   overflow: hidden;
   padding: 48px 64px;
@@ -249,13 +269,14 @@ function submitRegistration() {
 .circle {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255,255,255,0.05);
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.16), rgba(255,255,255,0.04) 55%, rgba(255,255,255,0) 75%);
 }
 .circle-1 { width: 400px; height: 400px; top: -150px; right: -100px; }
 .circle-2 { width: 350px; height: 350px; bottom: 100px; right: -150px; }
 .circle-3 { width: 450px; height: 450px; bottom: -250px; left: -150px; }
 
-.brand { display: flex; align-items: center; gap: 8px; font-size: 1.2rem; font-weight: 700; position: relative; z-index: 1; }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; position: relative; z-index: 1; }
+.logo-img { width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; }
 .logo-match { color: #D4A017; }
 
 .left-content { margin-top: 120px; position: relative; z-index: 1; }
@@ -333,23 +354,62 @@ function submitRegistration() {
 .subtitle { color: #8a9a8a; font-size: 0.9rem; margin-bottom: 32px; }
 
 /* ROLE CARDS */
-.role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+.role-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
 
 .role-card {
-  border: 1px solid #e0e5e0;
-  border-radius: 10px;
+  border: 1.5px solid #e0e5e0;
+  border-radius: 12px;
   padding: 28px 16px;
   display: flex; flex-direction: column; align-items: center; gap: 6px;
   background: #fff;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.15s ease;
 }
-.role-card:hover { border-color: #1a3a1a; }
-.role-card.selected { border-color: #D4A017; background: #fffbf0; box-shadow: 0 0 0 1px #D4A017; }
+.role-card:hover { border-color: #1a3a1a; transform: translateY(-1px); }
+.role-card.selected {
+  border-color: #1a3a1a;
+  background: #f6f9f6;
+  box-shadow: 0 0 0 1px #1a3a1a;
+}
 
-.role-icon { font-size: 1.5rem; margin-bottom: 4px; }
+.role-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6a8a6a;
+  margin-bottom: 6px;
+  transition: color 0.15s ease;
+}
+.role-card.selected .role-icon,
+.role-card:hover .role-icon { color: #1a3a1a; }
+
 .role-name { font-weight: 700; color: #1a3a1a; }
 .role-desc { font-size: 0.78rem; color: #8a9a8a; }
+
+/* ROLE INFO BOX — mirrors the Figma hint box under the role grid */
+.role-info-box {
+  border-left: 3px solid #1a3a1a;
+  background: #f6f5ef;
+  border-radius: 6px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+}
+.role-info-box p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: #4a5a4a;
+  margin: 0;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
 
 /* FORM FIELDS */
 .details-form { display: flex; flex-direction: column; gap: 18px; margin-bottom: 12px; }
