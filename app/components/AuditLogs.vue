@@ -71,7 +71,7 @@ const tagColor = (tag) => ({
     </div>
 
     <div class="space-y-4">
-      <div class="animate-in bg-white rounded-2xl p-5">
+      <div class="animate-in bg-white border border-forest/15 rounded-2xl p-5">
         <h3 class="font-display text-lg text-forest-dark mb-3">Activity Snapshot</h3>
         <div class="flex justify-between text-sm py-2 border-b border-forest/5">
           <span class="text-forest/50">Events today</span><span class="font-semibold animate-pop">12</span>
