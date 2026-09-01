@@ -437,7 +437,7 @@ function handleAdminLogin() {
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
 }
 .admin-page-logo-icon { width: 40px; height: 34px; object-fit: contain; }
 .admin-page-logo-text {
