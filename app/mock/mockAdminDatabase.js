@@ -3,7 +3,7 @@ import { ref } from 'vue'
 // Frontend rani
 
 //hide ra nako ang sulod na data temporary pwede siya e flase para makita ang data sa frontend
-const HIDE_DATA = false
+const HIDE_DATA = true
 
 const rawRnds = [
   {
