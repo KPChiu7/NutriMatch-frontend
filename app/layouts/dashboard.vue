@@ -49,22 +49,16 @@
 
     <!-- MAIN COLUMN -->
     <div class="main-column">
-      <!-- STICKY TOP HEADER -->
-      <!-- <header class="topbar">
-        <div>
-          <h1>{{ pageTitle }}</h1>
-          <span class="topbar-date">{{ todayLabel }}</span>
-        </div>
+          <!-- STICKY TOP HEADER -->
+      <header class="topbar topbar-minimal">
         <div class="topbar-actions">
-          <div class="search-box">
-            <Search class="search-icon" :size="15" />
-            <input type="text" placeholder="Search patients, records..." />
-          </div>
-          <button class="icon-btn"><MessageSquare :size="17" /></button>
+          <button class="icon-btn" @click="navigateTo('/messages')">
+            <MessageSquare :size="17" />
+          </button>
           <button class="icon-btn"><Bell :size="17" /></button>
           <button class="icon-btn avatar-btn"><User :size="17" /></button>
         </div>
-      </header> -->
+      </header>
 
       <!-- SCROLLABLE CONTENT -->
       <main class="content">
@@ -113,14 +107,13 @@ const mainNav = [
   { icon: SearchIcon, label: 'Food Exchange Search', to: '/food-exchange-search' },
   { icon: CalendarDays, label: 'Availability', to: '/availability' },
   { icon: FileText, label: 'Resources', to: '/resource-library' },
-  { icon: MessageCircle, label: 'Messages', to: '/messages' },
   { icon: Wallet, label: 'Earnings', to: '/earnings' },
   { icon: Star, label: 'Reviews', to: '/reviews' }
 ]
 
 const accountNav = [
-  { icon: UserCog, label: 'Profile Settings', to: '/profile-settings' },
-  { icon: Languages, label: 'Languages', to: '/languages' }
+  { icon: UserCog, label: 'Profile Settings', to: '/profile-settings' }
+ 
 ]
 
 function handleLogout() {
@@ -202,6 +195,7 @@ function handleLogout() {
   width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e5e8e5;
   background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5a4a;
 }
+.topbar-minimal { justify-content: flex-end; border-bottom: none; background: transparent; padding: 18px 32px 0; }
 .avatar-btn { border-radius: 50%; }
 
 .content { flex: 1; overflow-y: auto; padding: 24px 100px 100px; }
