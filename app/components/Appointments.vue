@@ -1,7 +1,6 @@
 <template>
   <div class="appointments-page">
     <div class="page-header">
-      <h1 class="page-title">Appointments</h1>
       <p class="page-sub">Manage your upcoming and past consultations.</p>
     </div>
 

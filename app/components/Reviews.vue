@@ -1,7 +1,6 @@
 <template>
   <div class="reviews-page">
     <div class="page-header">
-      <h1 class="page-title">Patient Reviews</h1>
       <p class="page-sub">See what your patients are saying about their care.</p>
     </div>
 

@@ -3,7 +3,6 @@
     <!-- PAGE HEADER -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">Weekly Availability</h1>
         <p class="page-subtitle">Set the hours clients can book consultations with you.</p>
       </div>
       <button class="add-slot-btn" @click="addSlot(week[0].day)"><Plus :size="16" /> Add Time Slot</button>

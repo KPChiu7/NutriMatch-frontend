@@ -5,6 +5,32 @@ import { ref } from 'vue'
 //hide ra nako ang sulod na data temporary pwede siya e flase para makita ang data sa frontend
 const HIDE_DATA = true
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const rawRnds = [
   {
     id: 1,

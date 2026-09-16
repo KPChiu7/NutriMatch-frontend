@@ -2,63 +2,80 @@
   <div class="rnd-dashboard">
     <!-- WELCOME BANNER -->
     <section class="welcome-banner">
-      <div class="banner-text">
-        <span class="banner-eyebrow">— WELCOME BACK</span>
+      <div class="banner-blob banner-blob-1"></div>
+      <div class="banner-blob banner-blob-2"></div>
+
+      <div class="banner-content">
+        <span class="banner-badge"><span class="banner-badge-dot"></span> WELCOME BACK</span>
         <h2 class="banner-title">Good Day, {{ rnd?.name || 'RND' }}.</h2>
         <p class="banner-sub">
-          {{ appointments.length }} consultations today · {{ draftRecords.length }} NCP records awaiting finalization · {{ patientRequests.length }} new patient requests
+          <strong>{{ appointments.length }} consultations</strong> today ·
+          <strong>{{ draftRecords.length }} NCP records</strong> awaiting finalization ·
+          <strong>{{ patientRequests.length }} new patient requests</strong>
         </p>
+        <div class="banner-actions">
+          <button class="banner-btn">View Today's Schedule</button>
+        </div>
       </div>
-      <button class="banner-btn">View Today's Schedule</button>
     </section>
 
     <!-- STAT CARDS -->
     <section class="stat-grid">
       <div class="stat-card">
-        <div class="stat-icon"><Users :size="18" /></div>
+        <div class="stat-top">
+          <div class="stat-icon"><Users :size="17" /></div>
+        </div>
         <p class="stat-value">{{ patients.length }}</p>
         <p class="stat-label">Active Patients</p>
         <p v-if="patients.length" class="stat-delta up">↑ 3 new this month</p>
         <p v-else class="stat-delta neutral">No patients yet</p>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><CalendarCheck :size="18" /></div>
+        <div class="stat-top">
+          <div class="stat-icon icon-gold"><CalendarCheck :size="17" /></div>
+        </div>
         <p class="stat-value">{{ todaysSchedule.length }}</p>
         <p class="stat-label">Today's Sessions</p>
         <p v-if="todaysSchedule.length" class="stat-delta neutral">🕐 Next at {{ todaysSchedule[0].time }}</p>
         <p v-else class="stat-delta neutral">Nothing scheduled</p>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><Trophy :size="18" /></div>
+        <div class="stat-top">
+          <div class="stat-icon"><Trophy :size="17" /></div>
+        </div>
         <p class="stat-value">{{ earningsSummary.goalAchievement || '—' }}%</p>
         <p class="stat-label">Avg. Goal Achievement</p>
         <p class="stat-delta neutral">No data yet</p>
       </div>
       <div class="stat-card">
-        <div class="stat-icon"><Landmark :size="18" /></div>
+        <div class="stat-top">
+          <div class="stat-icon icon-gold"><Landmark :size="17" /></div>
+        </div>
         <p class="stat-value">₱{{ earningsSummary.thisMonthNet.toLocaleString() }}</p>
         <p class="stat-label">Earnings (This Month)</p>
         <p class="stat-delta neutral">{{ earningsSummary.billableSessionsThisMonth }} billable sessions</p>
       </div>
     </section>
 
-    <!-- TABS -->
-    <nav class="dash-tabs">
-      <button
-        v-for="tab in tabs"
-        :key="tab.label"
-        class="tab-item"
-        :class="{ active: activeTab === tab.label }"
-        @click="activeTab = tab.label"
-      >
-        <component :is="tab.icon" :size="15" />
-        {{ tab.label }}
-      </button>
-    </nav>
-
     <!-- ============ OVERVIEW TAB ============ -->
     <section v-if="activeTab === 'Overview'" class="dash-grid">
       <div class="dash-col">
+        <div class="panel">
+          <div class="panel-header-row">
+            <h3 class="panel-title">Patient Adherence — Weekly</h3>
+            <a href="#" class="panel-link">View Report →</a>
+          </div>
+          <div class="bar-chart">
+            <div class="bar-col" v-for="d in weeklyAdherence" :key="d.day">
+              <div class="bar-wrap">
+                <span class="bar-tooltip">{{ d.value }}%</span>
+                <div class="bar" :class="d.variant" :style="{ height: d.value + '%' }"></div>
+              </div>
+              <span class="bar-label">{{ d.day }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="panel">
           <h3 class="panel-title">Clinical Alerts</h3>
           <div v-if="clinicalAlerts.length" class="alert-list">
@@ -297,22 +314,30 @@
     <section v-if="activeTab === 'Earnings & Billing'" class="earnings-panel">
       <div class="stat-grid">
         <div class="stat-card">
-          <div class="stat-icon"><Eye :size="18" /></div>
+          <div class="stat-top">
+            <div class="stat-icon"><Eye :size="17" /></div>
+          </div>
           <p class="stat-value">₱{{ earningsSummary.gross.toLocaleString() }}</p>
           <p class="stat-label">Gross This Month</p>
         </div>
         <div class="stat-card">
-          <div class="stat-icon"><Percent :size="18" /></div>
+          <div class="stat-top">
+            <div class="stat-icon"><Percent :size="17" /></div>
+          </div>
           <p class="stat-value">₱{{ earningsSummary.commission.toLocaleString() }}</p>
           <p class="stat-label">Commission (10%)</p>
         </div>
         <div class="stat-card">
-          <div class="stat-icon"><Wallet :size="18" /></div>
+          <div class="stat-top">
+            <div class="stat-icon"><Wallet :size="17" /></div>
+          </div>
           <p class="stat-value">₱{{ earningsSummary.net.toLocaleString() }}</p>
           <p class="stat-label">Net Earnings</p>
         </div>
         <div class="stat-card">
-          <div class="stat-icon pending-icon"><Hourglass :size="18" /></div>
+          <div class="stat-top">
+            <div class="stat-icon icon-gold"><Hourglass :size="17" /></div>
+          </div>
           <p class="stat-value">₱{{ earningsSummary.pending.toLocaleString() }}</p>
           <p class="stat-label">Pending</p>
         </div>
@@ -419,6 +444,17 @@ const todaysSchedule = ref(db.todaysSchedule)
 const draftRecords = ref(db.draftRecords)
 const healthOutcomes = ref(db.healthOutcomes)
 const clinicalAlerts = ref(db.clinicalAlerts)
+
+// TODO: wire to real weekly adherence data from db
+const weeklyAdherence = ref([
+  { day: 'Mon', value: 55, variant: 'bar-mint' },
+  { day: 'Tue', value: 78, variant: 'bar-gold' },
+  { day: 'Wed', value: 42, variant: 'bar-mint' },
+  { day: 'Thu', value: 90, variant: 'bar-mint' },
+  { day: 'Fri', value: 68, variant: 'bar-gold' },
+  { day: 'Sat', value: 95, variant: 'bar-mint' },
+  { day: 'Sun', value: 65, variant: 'bar-gold' }
+])
 const mealPlans = ref(db.mealPlans)
 const resources = ref(db.resources)
 const earningsSummary = ref(db.earningsSummary)
@@ -482,24 +518,47 @@ const earningsProgress = computed(() =>
 
 /* WELCOME BANNER */
 .welcome-banner {
-  background: linear-gradient(135deg, #14301a, #1e4a26);
-  border-radius: 16px; padding: 32px 36px; display: flex; align-items: center;
-  justify-content: space-between; margin-bottom: 24px; color: #fff;
+  position: relative;
+  background: linear-gradient(135deg, #00382a 0%, #005a42 100%);
+  border-radius: 16px; padding: 32px 36px; overflow: hidden;
+  margin: 0 0 24px; color: #fff;
+  width: 100%;
 }
-.banner-eyebrow { font-size: 0.7rem; letter-spacing: 0.1em; color: #D4A017; font-weight: 700; }
-.banner-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.7rem; margin: 8px 0 6px; color: #fff; }
-.banner-sub { font-size: 0.85rem; color: #b8ccb8; margin: 0; }
-.banner-btn { background: #D4A017; color: #1a3a1a; border: none; border-radius: 24px; padding: 12px 24px; font-weight: 700; font-size: 0.88rem; cursor: pointer; flex-shrink: 0; }
+.banner-blob { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.05); }
+.banner-blob-1 { width: 260px; height: 260px; top: -90px; right: 40px; }
+.banner-blob-2 { width: 160px; height: 160px; bottom: -70px; right: -20px; background: rgba(255,255,255,0.04); }
+
+.banner-content { position: relative; z-index: 1; }
+.banner-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(0,0,0,0.2); color: #D4A017;
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+  padding: 5px 14px; border-radius: 20px; margin-bottom: 14px;
+}
+.banner-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #D4A017; }
+.banner-title { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; margin: 0 0 8px; color: #fff; }
+.banner-sub { font-size: 0.85rem; color: #cfe0d5; margin: 0 0 20px; max-width: 620px; line-height: 1.5; }
+.banner-sub strong { color: #f0c419; font-weight: 700; }
+.banner-actions { display: flex; gap: 10px; }
+.banner-btn {
+  background: #D4A017; color: #1a3a1a; border: none; border-radius: 8px;
+  padding: 11px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+}
+.banner-btn-outline {
+  background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px; padding: 11px 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+}
 
 /* STAT CARDS */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
-.stat-card { background: #fff; border-radius: 12px; padding: 20px; border: 1px solid #eceeec; }
-.stat-icon { width: 36px; height: 36px; border-radius: 8px; background: #eef3ec; display: flex; align-items: center; justify-content: center; color: #1e4a26; margin-bottom: 12px; }
-.stat-icon.pending-icon { background: #faf1de; color: #b8860b; }
+.stat-card { background: #fff; border-radius: 14px; padding: 20px; border: 1px solid #eceeec; }
+.stat-top { margin-bottom: 12px; }
+.stat-icon { width: 34px; height: 34px; border-radius: 9px; background: #eef3ec; display: flex; align-items: center; justify-content: center; color: #1e4a26; }
+.stat-icon.icon-gold { background: #fdf1d6; color: #b8860b; }
 .stat-value { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: #1a3a1a; margin: 0; }
 .stat-label { font-size: 0.8rem; color: #6a7a6a; margin: 4px 0 8px; }
 .stat-delta { font-size: 0.75rem; margin: 0; }
-.stat-delta.up { color: #2e7d32; }
+.stat-delta.up { color: #1f8f5c; }
 .stat-delta.neutral { color: #8a9a8a; }
 
 /* TABS */
@@ -510,8 +569,39 @@ const earningsProgress = computed(() =>
 /* GRID */
 .dash-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
 .dash-col { display: flex; flex-direction: column; gap: 20px; }
-.panel { background: #fff; border-radius: 12px; border: 1px solid #eceeec; padding: 22px; }
+.panel { background: #fff; border-radius: 14px; border: 1px solid #eceeec; padding: 22px; }
 .panel-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #1a3a1a; margin: 0 0 16px; }
+.panel-header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+.panel-header-row .panel-title { margin: 0; }
+.panel-link { font-size: 0.78rem; color: #1f8f5c; font-weight: 600; text-decoration: none; }
+
+/* BAR CHART */
+.bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 170px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 8px; }
+.bar-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: flex-end; }
+.bar {
+  width: 100%; border-radius: 6px 6px 0 0;
+  transition: height 0.2s ease, filter 0.15s ease, transform 0.15s ease;
+  cursor: pointer;
+}
+.bar:hover { background: #14301a; transform: scaleY(1.02); transform-origin: bottom; }
+.bar-mint { background: #cfe3da; }
+.bar-gold { background: #f1cf6b; }
+.bar-dark { background: #14301a; }
+.bar-gold:hover { background: #f0c419; }
+.bar-label { font-size: 0.72rem; color: #9aaa9a; }
+
+.bar-tooltip {
+  position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: #14301a; color: #fff; font-size: 0.72rem; font-weight: 700;
+  padding: 4px 9px; border-radius: 6px; white-space: nowrap;
+  opacity: 0; pointer-events: none; transition: opacity 0.15s ease, bottom 0.15s ease;
+}
+.bar-tooltip::after {
+  content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  border: 5px solid transparent; border-top-color: #14301a;
+}
+.bar-wrap:hover .bar-tooltip { opacity: 1; bottom: calc(100% + 12px); }
 
 /* ALERTS */
 .alert-list { display: flex; flex-direction: column; gap: 10px; }
@@ -527,14 +617,14 @@ const earningsProgress = computed(() =>
 .outcome-item { text-align: left; }
 .outcome-value { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; margin: 0; }
 .outcome-value.olive { color: #6b7a3a; }
-.outcome-value.green { color: #2e7d32; }
+.outcome-value.green { color: #1f8f5c; }
 .outcome-value.blue { color: #2a5a8a; }
 .outcome-value.gold { color: #b8860b; }
 .outcome-label { font-size: 0.72rem; color: #8a9a8a; margin: 4px 0 0; }
 
 /* SCHEDULE */
 .schedule-list { display: flex; flex-direction: column; gap: 10px; }
-.schedule-item { background: #eef3ec; border-left: 3px solid #D4A017; border-radius: 8px; padding: 12px 14px; }
+.schedule-item { background: #f7f9f7; border-left: 3px solid #D4A017; border-radius: 8px; padding: 12px 14px; }
 .schedule-time { font-size: 0.72rem; font-weight: 700; color: #b8860b; margin: 0 0 2px; }
 .schedule-name { font-size: 0.9rem; font-weight: 700; color: #1a3a1a; margin: 0 0 2px; }
 .schedule-detail { font-size: 0.76rem; color: #6a7a6a; margin: 0; }
@@ -542,7 +632,7 @@ const earningsProgress = computed(() =>
 /* REQUESTS */
 .request-list { display: flex; flex-direction: column; gap: 12px; }
 .request-item { display: flex; align-items: center; gap: 12px; }
-.request-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1e4a26; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; }
+.request-avatar { width: 36px; height: 36px; border-radius: 50%; background: #00382a; color: #D4A017; display: flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0; }
 .request-info { flex: 1; }
 .request-name { font-size: 0.86rem; font-weight: 700; color: #1a3a1a; margin: 0; }
 .request-time { font-size: 0.74rem; color: #8a9a8a; margin: 0; }
@@ -557,12 +647,12 @@ const earningsProgress = computed(() =>
 .view-earnings-btn { width: 100%; background: #fff; border: 1px solid #1a3a1a; color: #1a3a1a; border-radius: 8px; padding: 10px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
 
 /* PATIENT PANEL */
-.patient-panel { background: #fff; border-radius: 12px; border: 1px solid #eceeec; padding: 22px; }
+.patient-panel { background: #fff; border-radius: 14px; border: 1px solid #eceeec; padding: 22px; }
 .panel-toolbar { display: flex; gap: 12px; margin-bottom: 20px; }
 .search-box-wide { flex: 1; display: flex; align-items: center; gap: 8px; background: #f4f6f4; border-radius: 8px; padding: 10px 14px; }
-.search-box-wide input { border: none; background: none; outline: none; font-size: 0.85rem; width: 100%; }
-.search-icon { color: #9aaa9a; flex-shrink: 0; }
-.status-select { border: 1px solid #e5e8e5; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #4a5a4a; background: #fff; cursor: pointer; }
+.search-box-wide input { border: none; border: 1px solid #B7C8BD; background: none; outline: none; font-size: 0.85rem; width: 100%; }
+.search-icon { color: #B7C8BD; flex-shrink: 0; }
+.status-select { border: 1px solid #B7C8BD; border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; color: #4a5a4a; background: #fff; cursor: pointer; }
 
 .patient-table-wrap { overflow-x: auto; }
 .patient-table { width: 100%; border-collapse: collapse; }
@@ -572,7 +662,7 @@ const earningsProgress = computed(() =>
 .patient-cell { display: flex; align-items: center; gap: 10px; }
 .patient-avatar, .draft-avatar, .mealplan-avatar, .appt-avatar { width: 32px; height: 32px; border-radius: 50%; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.72rem; font-weight: 700; flex-shrink: 0; }
 .patient-name { font-weight: 700; color: #1a3a1a; }
-.status-pill { background: #e6efe0; color: #3a6b3a; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
+.status-pill { background: #e3f3ea; color: #1f8f5c; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
 .status-pill.pending-pill { background: #faead0; color: #b8860b; }
 .alert-pill { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
 .alert-pill.danger { background: #f9d6d0; color: #c0392b; }
@@ -584,14 +674,14 @@ const earningsProgress = computed(() =>
 
 /* APPOINTMENTS */
 .appointments-panel { display: flex; flex-direction: column; gap: 16px; }
-.appt-card { background: #fff; border-radius: 12px; border: 1px solid #eceeec; padding: 20px 22px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.appt-card { background: #fff; border-radius: 14px; border: 1px solid #eceeec; padding: 20px 22px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
 .appt-date { width: 52px; height: 52px; border-radius: 8px; background: #eef3ec; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
 .appt-day { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #1a3a1a; line-height: 1; }
 .appt-month { font-size: 0.62rem; letter-spacing: 0.05em; color: #6a7a6a; margin-top: 2px; }
 .appt-info { flex: 1; }
 .appt-name { display: flex; align-items: center; gap: 10px; font-size: 0.95rem; font-weight: 700; color: #1a3a1a; margin: 0 0 4px; }
 .appt-status-pill { font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
-.appt-status-pill.confirmed { background: #e6efe0; color: #3a6b3a; }
+.appt-status-pill.confirmed { background: #e3f3ea; color: #1f8f5c; }
 .appt-status-pill.awaiting { background: #faead0; color: #b8860b; }
 .appt-detail { font-size: 0.8rem; color: #6a7a6a; margin: 0; }
 .start-session-btn { background: #D4A017; color: #1a3a1a; border: none; border-radius: 8px; padding: 10px 18px; font-weight: 700; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
@@ -621,12 +711,12 @@ const earningsProgress = computed(() =>
 .open-search-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: #D4A017; color: #1a3a1a; border: none; border-radius: 24px; padding: 13px; font-weight: 700; font-size: 0.88rem; cursor: pointer; }
 
 /* RESOURCES LIBRARY */
-.resources-panel { background: #fff; border-radius: 12px; border: 1px solid #eceeec; padding: 22px; }
+.resources-panel { background: #fff; border-radius: 14px; border: 1px solid #eceeec; padding: 22px; }
 .resources-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .upload-btn { display: flex; align-items: center; gap: 6px; background: #D4A017; color: #1a3a1a; border: none; border-radius: 8px; padding: 9px 16px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
 .resource-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
 .resource-item { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f2f4f2; }
-.resource-icon { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.resource-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .resource-icon.icon-pdf { background: #fbe4e0; color: #c0392b; }
 .resource-icon.icon-video { background: #dde7f7; color: #2a5a8a; }
 .resource-icon.icon-article { background: #eef3ec; color: #1e4a26; }
@@ -636,7 +726,7 @@ const earningsProgress = computed(() =>
 
 /* EARNINGS & BILLING */
 .earnings-panel { display: flex; flex-direction: column; gap: 20px; }
-.invoice-table-wrap { background: #fff; border-radius: 12px; border: 1px solid #eceeec; padding: 22px; }
+.invoice-table-wrap { background: #fff; border-radius: 14px; border: 1px solid #eceeec; padding: 22px; }
 .invoice-id { font-weight: 700; color: #1a3a1a; }
 .invoice-net { font-weight: 700; color: #1a3a1a; }
 .muted { color: #9aaa9a; }
@@ -649,7 +739,7 @@ const earningsProgress = computed(() =>
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; inset: 0; background: #d5dad5; border-radius: 22px; transition: 0.2s; }
 .slider::before { content: ""; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
-.switch input:checked + .slider { background: #1e4a26; }
+.switch input:checked + .slider { background: #00382a; }
 .switch input:checked + .slider::before { transform: translateX(18px); }
 .save-btn { background: #D4A017; color: #1a3a1a; border: none; border-radius: 8px; padding: 11px 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer; margin-top: 8px; }
 

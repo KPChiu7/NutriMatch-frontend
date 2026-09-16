@@ -3,7 +3,6 @@
     <!-- PAGE HEADER -->
     <div class="page-header">
       <div>
-        <h1 class="page-title">Earnings</h1>
         <p class="page-subtitle">Track your revenue, commission, and payout history.</p>
       </div>
       <div class="period-select">

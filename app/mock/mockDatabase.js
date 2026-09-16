@@ -24,7 +24,7 @@
  */
 
 // ---------------------------------------------------------------------------
-export const USE_EMPTY_STATE = true
+export const USE_EMPTY_STATE = false
 // ---------------------------------------------------------------------------
 
 function list(arr) {
@@ -318,46 +318,65 @@ const personalInfoEmpty = {
 /* =========================================================================
    CLIENT: MESSAGES
 ========================================================================= */
-// const conversationsFull = [
-//   {
-//     id: 'conv-001',
-//     participantId: 'rnd-001',
-//     name: 'RND Ivy Hope Alba',
-//     initials: 'IA',
-//     avatarColor: '#1e4a26',
-//     online: true,
-//     lastMessage: "Let's review your glucose readi...",
-//     lastMessageAt: '2m',
-//     unread: 0
-//   },
-//   {
-//     id: 'conv-002',
-//     participantId: null,
-//     name: 'NutriMatch Support',
-//     initials: 'NM',
-//     avatarColor: '#D4A017',
-//     online: false,
-//     lastMessage: 'Your invoice #INV-0231 is ready.',
-//     lastMessageAt: '2d',
-//     unread: 0
-//   }
-// ]
- 
-// const conversationsEmpty = []
- 
-// const messagesByConversationFull = {
-//   'conv-001': [
-//     { id: 'msg-001', sender: 'them', text: 'Hi Juan! I can see your screening results. Your BMI looks great this month.', time: '9:02 AM' },
-//     { id: 'msg-002', sender: 'me', text: "Thank you po! I've been following the meal plan closely.", time: '9:05 AM' },
-//     { id: 'msg-003', sender: 'them', text: "That's wonderful to hear. Let's review your glucose readings from the past two weeks during our video call on Friday.", time: '9:06 AM' },
-//     { id: 'msg-004', sender: 'me', text: "Sounds good! I'll have my logbook ready.", time: '9:08 AM' }
-//   ],
-//   'conv-002': [
-//     { id: 'msg-005', sender: 'them', text: 'Your invoice #INV-0231 is ready. You can view it under Billing.', time: '10:14 AM' }
-//   ]
-// }
- 
-// const messagesByConversationEmpty = {}
+const conversationsFull = [
+  {
+    id: 'conv-001',
+    participantId: 'client-001',
+    name: 'Julia Niel Bulalaque',
+    initials: 'JD',
+    avatarColor: '#1e4a26',
+    online: true,
+    condition: 'Diabetes',
+    lastMessage: 'Good morning po! I just finished my breakfast log...',
+    lastMessageAt: '9:15 AM',
+    unreadCount: 2,
+    isTyping: false
+  },
+  {
+    id: 'conv-002',
+    participantId: null,
+    name: 'NutriMatch Support',
+    initials: 'NS',
+    avatarColor: '#9aaa9a',
+    online: false,
+    condition: '',
+    lastMessage: 'Your May invoice has been generated.',
+    lastMessageAt: 'Yesterday',
+    unreadCount: 0,
+    isTyping: false
+  },
+  {
+    id: 'conv-003',
+    participantId: 'rnd-001',
+    name: 'RND Merian Felizarta',
+    initials: 'MF',
+    avatarColor: '#D4A017',
+    online: false,
+    condition: '',
+    lastMessage: 'Thank you for the referral question — happy to...',
+    lastMessageAt: 'Apr 28',
+    unreadCount: 0,
+    isTyping: false
+  }
+]
+
+const conversationsEmpty = []
+
+const messagesByConversationFull = {
+  'conv-001': [
+    { id: 'msg-001', sender: 'them', text: 'Good morning po! I just finished my breakfast log. Is oatmeal with banana okay for today?', time: '8:30 AM' },
+    { id: 'msg-002', sender: 'me', text: "Yes po, that's great! Oatmeal is a perfect low-GI option. Just keep the banana to half a piece to control the sugar. 👍", time: '9:00 AM' },
+    { id: 'msg-003', sender: 'them', text: 'Thank you!', time: '9:15 AM' }
+  ],
+  'conv-002': [
+    { id: 'msg-004', sender: 'them', text: 'Your May invoice has been generated. You can view it under Earnings.', time: 'Yesterday' }
+  ],
+  'conv-003': [
+    { id: 'msg-005', sender: 'them', text: 'Thank you for the referral question — happy to help with the renal case whenever you need a second opinion.', time: 'Apr 28' }
+  ]
+}
+
+const messagesByConversationEmpty = {}
 
 /* =========================================================================
    CLIENT ROLE (for when you build client-facing pages)
@@ -571,8 +590,8 @@ export const db = {
   personalInfo: USE_EMPTY_STATE ? personalInfoEmpty : personalInfoFull,
 
    // Client: Messages
-  // conversations: USE_EMPTY_STATE ? conversationsEmpty : conversationsFull,
-  // messagesByConversation: USE_EMPTY_STATE ? messagesByConversationEmpty : messagesByConversationFull,
+  conversations: USE_EMPTY_STATE ? conversationsEmpty : conversationsFull,
+  messagesByConversation: USE_EMPTY_STATE ? messagesByConversationEmpty : messagesByConversationFull,
 
   // Client role
   clientProfile: record(clientProfileFull),
