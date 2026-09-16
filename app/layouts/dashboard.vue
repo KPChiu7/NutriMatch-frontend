@@ -68,17 +68,17 @@
     <!-- MAIN COLUMN -->
     <div class="main-column">
       <!-- STICKY TOP HEADER -->
-      <!-- <header class="topbar">
+      <header class="topbar">
         <div>
           <h1>{{ pageTitle }}</h1>
           <span class="topbar-date">{{ todayLabel }}</span>
         </div>
         <div class="topbar-actions">
           <div class="search-box">
-            <Search class="search-icon" :size="15" />
+            <SearchIcon class="search-icon" :size="15" />
             <input type="text" placeholder="Search patients, records..." />
           </div>
-          <button class="icon-btn"><MessageSquare :size="17" /></button>
+          <button class="icon-btn" @click="navigateTo('/messages')"><MessageSquare :size="17" /></button>
           <button class="icon-btn"><Bell :size="17" /></button>
           <button class="icon-btn avatar-btn"><User :size="17" /></button>
         </div>
@@ -96,7 +96,7 @@
 import {
   LayoutDashboard, Users, CalendarCheck, LineChart, Target,
   Search as SearchIcon, CalendarDays, FileText,
-  Wallet, Star, UserCog, Languages, LogOut, MessageSquare, Bell, User,
+  Wallet, Star, UserCog, Languages, LogOut, MessageSquare, Bell, User, MessageCircle,
   ChevronDown, ChevronUp, Settings as SettingsIcon
 } from 'lucide-vue-next'
 
@@ -141,14 +141,21 @@ const accountNav = [
   { icon: Languages, label: 'Languages', to: '/languages' }
 ]
 
+// TODO: navGroups isn't defined in this version of the file — the sidebar's
+// <nav> loop above expects it. Wire it up (e.g. group mainNav under a
+// 'MAIN' label) or replace the loop with mainNav directly.
+const navGroups = [
+  { label: 'MAIN', items: mainNav }
+]
+
+const showAccountMenu = ref(false)
+
 function handleLogout() {
   navigateTo('/login')
 }
 
 function handleClickOutside() {
   showAccountMenu.value = false
-  showNotifications.value = false
-  showProfilePopover.value = false
 }
 onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
