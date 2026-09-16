@@ -115,12 +115,12 @@ onBeforeUnmount(() => {
   left: 0;
   right: 0;
   z-index: 1000;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.75rem; font-weight: 100; color: #c8d8c8;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem; font-style: bold; ght: 100; color: #c8d8c8;
 }
 
 .nav-logo { display: flex; align-items: center; gap: 10px; }
-.logo-text { font-size: 1.2rem; font-weight: 500; }
+.logo-text { font-size: 2; font-weight: 500; }
 .logo-nutri { color: #ffffff; }
 .logo-match { color: #D4A017; }
 

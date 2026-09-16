@@ -68,59 +68,19 @@
     <!-- MAIN COLUMN -->
     <div class="main-column">
       <!-- STICKY TOP HEADER -->
-      <header class="topbar">
+      <!-- <header class="topbar">
         <div>
           <h1>{{ pageTitle }}</h1>
           <span class="topbar-date">{{ todayLabel }}</span>
         </div>
-
         <div class="topbar-actions">
           <div class="search-box">
-            <SearchIcon class="search-icon" :size="15" />
+            <Search class="search-icon" :size="15" />
             <input type="text" placeholder="Search patients, records..." />
           </div>
-
-          <button class="icon-btn" @click="navigateTo('/messages')"><MessageSquare :size="17" /></button>
-
-          <div class="icon-btn-wrap">
-            <button class="icon-btn" @click.stop="toggleNotifications">
-              <Bell :size="17" />
-              <span v-if="notifications.length" class="icon-dot"></span>
-            </button>
-            <div v-if="showNotifications" class="dropdown-panel notif-panel">
-              <div class="dropdown-header">
-                <span>Notifications</span>
-                <button class="mark-read" @click="notifications = []">Mark all read</button>
-              </div>
-              <div v-if="notifications.length === 0" class="notif-empty">You're all caught up.</div>
-              <div v-for="n in notifications" :key="n.id" class="notif-item">
-                <div class="notif-avatar">{{ n.initials }}</div>
-                <div>
-                  <p class="notif-text"><strong>{{ n.name }}</strong> {{ n.message }}</p>
-                  <p class="notif-time">{{ n.time }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="icon-btn-wrap">
-            <button class="icon-btn avatar-btn" @click.stop="toggleProfilePopover">
-              <User :size="17" />
-            </button>
-            <div v-if="showProfilePopover" class="dropdown-panel profile-panel">
-              <div class="profile-panel-avatar">{{ userInitials }}</div>
-              <p class="profile-panel-name">{{ user.name }}, RND</p>
-              <p class="profile-panel-role">Registered Nutritionist-Dietitian</p>
-              <p class="profile-panel-license">License No. {{ user.prc }}-RND</p>
-              <hr />
-              <NuxtLink to="/profile-settings" class="profile-panel-item" @click="showProfilePopover = false">
-                <SettingsIcon :size="15" /> Settings
-              </NuxtLink>
-              <button class="profile-panel-item logout" @click="handleLogout">
-                <LogOut :size="15" /> Sign Out
-              </button>
-            </div>
-          </div>
+          <button class="icon-btn"><MessageSquare :size="17" /></button>
+          <button class="icon-btn"><Bell :size="17" /></button>
+          <button class="icon-btn avatar-btn"><User :size="17" /></button>
         </div>
       </header>
 
@@ -162,53 +122,24 @@ const userInitials = computed(() =>
     .toUpperCase()
 )
 
-// TODO: wire badge counts to real data (active patients, upcoming appointments, etc.)
-const navGroups = [
-  {
-    label: 'MAIN',
-    items: [
-      { icon: LayoutDashboard, label: 'Dashboard', to: '/rnd-dashboard' },
-      { icon: Users, label: 'My Patients', to: '/my-patients', badge: 28 },
-      { icon: CalendarCheck, label: 'Appointments', to: '/appointments', badge: 5 }
-    ]
-  },
-  {
-    label: 'CLINICAL',
-    items: [
-      { icon: LineChart, label: 'NCP Records', to: '/ncp-records' },
-      { icon: Target, label: 'Meal Plans', to: '/meal-planning' },
-      { icon: SearchIcon, label: 'Food Exchange Search', to: '/food-exchange-search' },
-      { icon: CalendarDays, label: 'Availability', to: '/availability' }
-    ]
-  },
-  {
-    label: 'RESOURCES',
-    items: [
-      { icon: FileText, label: 'Resources', to: '/resource-library' },
-      { icon: Wallet, label: 'Earnings', to: '/earnings' },
-      { icon: Star, label: 'Reviews', to: '/reviews' }
-    ]
-  }
+const mainNav = [
+  { icon: LayoutDashboard, label: 'Dashboard', to: '/rnd-dashboard' },
+  { icon: Users, label: 'My Patients', to: '/my-patients' },
+  { icon: CalendarCheck, label: 'Appointments', to: '/appointments' },
+  { icon: LineChart, label: 'NCP Records', to: '/ncp-records' },
+  { icon: Target, label: 'Meal Plans', to: '/meal-planning' },
+  { icon: SearchIcon, label: 'Food Exchange Search', to: '/food-exchange-search' },
+  { icon: CalendarDays, label: 'Availability', to: '/availability' },
+  { icon: FileText, label: 'Resources', to: '/resource-library' },
+  { icon: MessageCircle, label: 'Messages', to: '/messages' },
+  { icon: Wallet, label: 'Earnings', to: '/earnings' },
+  { icon: Star, label: 'Reviews', to: '/reviews' }
 ]
 
-const showAccountMenu = ref(false)
-const showNotifications = ref(false)
-const showProfilePopover = ref(false)
-
-// TODO: replace with real notifications from your API/store
-const notifications = ref([
-  { id: 1, initials: 'MT', name: 'Maria Torres', message: 'sent you a message', time: '4 hours ago' },
-  { id: 2, initials: 'EP', name: 'Edgar Pascual', message: 'requested a reschedule', time: 'Yesterday' }
-])
-
-function toggleNotifications() {
-  showNotifications.value = !showNotifications.value
-  showProfilePopover.value = false
-}
-function toggleProfilePopover() {
-  showProfilePopover.value = !showProfilePopover.value
-  showNotifications.value = false
-}
+const accountNav = [
+  { icon: UserCog, label: 'Profile Settings', to: '/profile-settings' },
+  { icon: Languages, label: 'Languages', to: '/languages' }
+]
 
 function handleLogout() {
   navigateTo('/login')
@@ -350,6 +281,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
   background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #4a5a4a;
   position: relative;
 }
+.topbar-minimal { justify-content: flex-end; border-bottom: none; background: transparent; padding: 18px 32px 0; }
 .avatar-btn { border-radius: 50%; }
 .icon-btn-wrap { position: relative; }
 .icon-dot { position: absolute; top: 7px; right: 7px; width: 7px; height: 7px; border-radius: 50%; background: #D4A017; }
